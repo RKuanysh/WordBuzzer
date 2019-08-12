@@ -4,6 +4,7 @@ import com.raimbekov.wordbuzzer.game.domain.GameRepository
 import com.raimbekov.wordbuzzer.game.model.Game
 import com.raimbekov.wordbuzzer.game.model.Player
 import com.raimbekov.wordbuzzer.game.model.Question
+import com.raimbekov.wordbuzzer.game.model.QuestionHolder
 import io.reactivex.Completable
 import io.reactivex.Single
 
@@ -28,8 +29,14 @@ class GameMemoryRepository : GameRepository {
     override fun setQuestions(questions: List<Question>): Completable =
         Completable.fromAction { this.questions = questions }
 
-    override fun getCurrentQuestion(): Single<Question> =
-        Single.fromCallable { questions.get(currentQuestion) }
+    override fun getQuestion(): Single<QuestionHolder> =
+        Single.fromCallable {
+            if (questions.size == currentQuestion) {
+                QuestionHolder.GameEnded
+            } else {
+                QuestionHolder.NextQuestion(questions.get(currentQuestion))
+            }
+        }
 
     override fun incrementScore(player: Player): Single<Int> =
         Single.fromCallable {
@@ -43,12 +50,6 @@ class GameMemoryRepository : GameRepository {
             val newScore = scores.get(player)!! - 1
             scores.put(player, newScore)
             newScore
-        }
-
-    override fun getNextQuestion(): Single<Question> =
-        Single.fromCallable {
-            currentQuestion += 1
-            questions.get(currentQuestion)
         }
 
     override fun incrementCurrentQuestion(): Completable =

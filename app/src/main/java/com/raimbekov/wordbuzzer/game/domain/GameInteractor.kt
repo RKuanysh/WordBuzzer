@@ -2,12 +2,12 @@ package com.raimbekov.wordbuzzer.game.domain
 
 import com.raimbekov.wordbuzzer.game.model.Game
 import com.raimbekov.wordbuzzer.game.model.Player
-import com.raimbekov.wordbuzzer.game.model.Question
+import com.raimbekov.wordbuzzer.game.model.QuestionHolder
 import com.raimbekov.wordbuzzer.word.domain.WordInteractor
 import io.reactivex.Completable
 import io.reactivex.Single
 
-private const val NUMBER_OF_QUESTIONS = 20
+private const val NUMBER_OF_QUESTIONS = 3
 
 class GameInteractor(
     private val wordInteractor: WordInteractor,
@@ -22,7 +22,8 @@ class GameInteractor(
             .andThen(gameRepository.getGame())
 
     fun setCorrectAnswer(player: Player): Single<Map<Player, Int>> =
-        gameRepository.getCurrentQuestion()
+        gameRepository.getQuestion()
+            .map { (it as QuestionHolder.NextQuestion).question }
             .map { it.correctAnswer == it.display }
             .flatMap { isCorrect ->
                 if (isCorrect) {
@@ -33,7 +34,7 @@ class GameInteractor(
             }
             .flatMap { gameRepository.getScore() }
 
-    fun getCurrentQuestion(): Single<Question> = gameRepository.getCurrentQuestion()
+    fun getCurrentQuestion(): Single<QuestionHolder> = gameRepository.getQuestion()
 
     fun moveToNextQuestion(): Completable = gameRepository.incrementCurrentQuestion()
 

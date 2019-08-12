@@ -1,6 +1,7 @@
 package com.raimbekov.wordbuzzer
 
 import android.os.Bundle
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_main.*
@@ -43,6 +44,13 @@ class MainActivity : AppCompatActivity() {
                     score2.text = score.get(player).toString()
                 }
             }
+        })
+
+        viewModel.endOfGameEvent.observe(this, Observer {
+            AlertDialog.Builder(this)
+                .setTitle("Game ended")
+                .setMessage("End of game")
+                .show()
         })
     }
 }

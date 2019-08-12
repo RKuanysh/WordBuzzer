@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import com.raimbekov.wordbuzzer.game.domain.GameInteractor
 import com.raimbekov.wordbuzzer.game.model.Player
 import com.raimbekov.wordbuzzer.game.model.Question
+import com.raimbekov.wordbuzzer.game.model.QuestionHolder
+import com.raimbekov.wordbuzzer.util.SingleLiveEvent
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -24,6 +26,7 @@ class GameViewModel(
     val playersLiveData = MutableLiveData<List<Player>>()
     val questionLiveData = MutableLiveData<Question>()
     val scoreLiveData = MutableLiveData<Map<Player, Int>>()
+    val endOfGameEvent = SingleLiveEvent<Unit>()
 
     init {
         gameSubscription = gameInteractor.start(numberOfPlayers)
@@ -66,8 +69,16 @@ class GameViewModel(
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
                 {
-                    questionLiveData.value = it
-                    launchTimer()
+                    when (it) {
+                        is QuestionHolder.NextQuestion -> {
+                            questionLiveData.value = it.question
+                            launchTimer()
+                        }
+                        is QuestionHolder.GameEnded -> {
+                            endOfGameEvent.value = Unit
+                        }
+                    }
+
                 },
                 { }
             )
