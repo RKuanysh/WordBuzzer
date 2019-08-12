@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import com.raimbekov.wordbuzzer.game.domain.GameInteractor
 import com.raimbekov.wordbuzzer.game.model.Player
 import com.raimbekov.wordbuzzer.game.model.Question
+import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class GameViewModel(
     numberOfPlayers: Int,
@@ -17,6 +19,7 @@ class GameViewModel(
     private val gameSubscription: Disposable
     private var answerSubscription: Disposable? = null
     private var questionSubscription: Disposable? = null
+    private var timerSubscription: Disposable? = null
 
     val playersLiveData = MutableLiveData<List<Player>>()
     val questionLiveData = MutableLiveData<Question>()
@@ -55,13 +58,17 @@ class GameViewModel(
     }
 
     fun requestQuestion() {
+        timerSubscription?.dispose()
         questionSubscription?.dispose()
 
         questionSubscription = gameInteractor.getCurrentQuestion()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { questionLiveData.value = it },
+                {
+                    questionLiveData.value = it
+                    launchTimer()
+                },
                 { }
             )
     }
@@ -71,5 +78,15 @@ class GameViewModel(
         gameSubscription.dispose()
         answerSubscription?.dispose()
         questionSubscription?.dispose()
+    }
+
+    private fun launchTimer() {
+        timerSubscription?.dispose()
+        timerSubscription = Completable.timer(3, TimeUnit.SECONDS)
+            .andThen(gameInteractor.moveToNextQuestion())
+            .subscribe(
+                { requestQuestion() },
+                { }
+            )
     }
 }
