@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.questionLiveData.observe(this, Observer {
             wordTextView.text = it.correctAnswer.word
+            translationTextView.text = it.display.translation
         })
 
         viewModel.scoreLiveData.observe(this, Observer { score ->
