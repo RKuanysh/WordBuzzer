@@ -1,6 +1,6 @@
 package com.raimbekov.wordbuzzer.game.model
 
 sealed class QuestionHolder {
-    object GameEnded : QuestionHolder()
+    class GameEnded(val winner: Player?) : QuestionHolder()
     class NextQuestion(val question: Question) : QuestionHolder()
 }

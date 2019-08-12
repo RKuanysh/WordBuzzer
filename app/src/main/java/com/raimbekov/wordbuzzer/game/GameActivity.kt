@@ -85,9 +85,10 @@ class MainActivity : AppCompatActivity() {
         viewModel.endOfGameEvent.observe(this, Observer {
             translationTextView.clearAnimation()
 
+            val message = if (it == null) "Draw game" else "player ${it.id} wins"
             AlertDialog.Builder(this)
                 .setTitle("Game ended")
-                .setMessage("End of game")
+                .setMessage(message)
                 .setOnDismissListener {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)

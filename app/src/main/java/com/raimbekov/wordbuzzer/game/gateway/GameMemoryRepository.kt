@@ -34,7 +34,18 @@ class GameMemoryRepository : GameRepository {
     override fun getQuestion(): Single<QuestionHolder> =
         Single.fromCallable {
             if (questions.size == currentQuestion.get()) {
-                QuestionHolder.GameEnded
+                var winner: Player? = null
+                var max: Int = -1000 // FIXME
+                scores.keys.forEach {
+                    val score = scores.get(it)
+                    if (score!!.compareTo(max) > 0) {
+                        winner = it
+                        max = score
+                    } else if (score.compareTo(max) == 0) {
+                        winner = null
+                    }
+                }
+                QuestionHolder.GameEnded(winner)
             } else {
                 QuestionHolder.NextQuestion(questions.get(currentQuestion.get()))
             }

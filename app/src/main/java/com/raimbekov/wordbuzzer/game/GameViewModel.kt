@@ -26,7 +26,7 @@ class GameViewModel(
     val playersLiveData = MutableLiveData<List<Player>>()
     val questionLiveData = MutableLiveData<Question>()
     val scoreLiveData = MutableLiveData<Map<Player, Int>>()
-    val endOfGameEvent = SingleLiveEvent<Unit>()
+    val endOfGameEvent = SingleLiveEvent<Player>()
 
     init {
         gameSubscription = gameInteractor.start(numberOfPlayers)
@@ -75,7 +75,7 @@ class GameViewModel(
                             launchTimer()
                         }
                         is QuestionHolder.GameEnded -> {
-                            endOfGameEvent.value = Unit
+                            endOfGameEvent.value = it.winner
                         }
                     }
 

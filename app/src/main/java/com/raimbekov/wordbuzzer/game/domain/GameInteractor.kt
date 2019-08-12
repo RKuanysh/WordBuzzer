@@ -40,7 +40,7 @@ class GameInteractor(
 
     private fun createGame(numberOfPlayers: Int): Game {
         val players = mutableListOf<Player>()
-        for (i in 0..numberOfPlayers) {
+        for (i in 0 until numberOfPlayers) {
             val player = Player(i)
             players.add(player)
         }
