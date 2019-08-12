@@ -16,8 +16,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewModel.testLiveData.observe(this, Observer {
-        })
+
         viewModel.playersLiveData.observe(this, Observer { players ->
             button1.text = "player ${players[0].id}"
             button2.text = "player ${players[1].id}"
@@ -35,11 +34,13 @@ class MainActivity : AppCompatActivity() {
             wordTextView.text = it.correctAnswer.word
         })
 
-        viewModel.scoreLiveData.observe(this, Observer { (player, score) ->
-            if (player.id == 0) {
-                score1.text = score.toString()
-            } else if (player.id == 1) {
-                score2.text = score.toString()
+        viewModel.scoreLiveData.observe(this, Observer { score ->
+            score.keys.forEach { player ->
+                if (player.id == 0) {
+                    score1.text = score.get(player).toString()
+                } else if (player.id == 1) {
+                    score2.text = score.get(player).toString()
+                }
             }
         })
     }

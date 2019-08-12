@@ -15,4 +15,5 @@ interface GameRepository {
     fun setGame(game: Game): Completable
     fun getGame(): Single<Game>
     fun incrementCurrentQuestion(): Completable
+    fun getScore(): Single<Map<Player, Int>>
 }

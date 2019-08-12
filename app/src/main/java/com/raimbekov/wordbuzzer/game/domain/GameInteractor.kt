@@ -21,7 +21,7 @@ class GameInteractor(
             .flatMapCompletable { questions -> gameRepository.setQuestions(questions) }
             .andThen(gameRepository.getGame())
 
-    fun setCorrectAnswer(player: Player): Single<Int> =
+    fun setCorrectAnswer(player: Player): Single<Map<Player, Int>> =
         gameRepository.getCurrentQuestion()
             .map { it.correctAnswer == it.display }
             .flatMap { isCorrect ->
@@ -31,6 +31,7 @@ class GameInteractor(
                     gameRepository.decrementScore(player)
                 }
             }
+            .flatMap { gameRepository.getScore() }
 
     fun getCurrentQuestion(): Single<Question> = gameRepository.getCurrentQuestion()
 

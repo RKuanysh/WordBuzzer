@@ -12,12 +12,12 @@ class GameMemoryRepository : GameRepository {
     private lateinit var game: Game
     private lateinit var questions: List<Question>
     private var currentQuestion: Int = 0
-    private val scores: HashMap<Int, Int> = HashMap()
+    private val scores: HashMap<Player, Int> = HashMap()
 
     override fun setGame(game: Game): Completable =
         Completable.fromAction {
             game.players.forEach { player ->
-                scores.put(player.id, 0)
+                scores.put(player, 0)
             }
             this.game = game
         }
@@ -33,15 +33,15 @@ class GameMemoryRepository : GameRepository {
 
     override fun incrementScore(player: Player): Single<Int> =
         Single.fromCallable {
-            val newScore = scores.get(player.id)!! + 1
-            scores.put(player.id, newScore)
+            val newScore = scores.get(player)!! + 1
+            scores.put(player, newScore)
             newScore
         }
 
     override fun decrementScore(player: Player): Single<Int> =
         Single.fromCallable {
-            val newScore = scores.get(player.id)!! - 1
-            scores.put(player.id, newScore)
+            val newScore = scores.get(player)!! - 1
+            scores.put(player, newScore)
             newScore
         }
 
@@ -55,4 +55,6 @@ class GameMemoryRepository : GameRepository {
         Completable.fromAction {
             currentQuestion += 1
         }
+
+    override fun getScore(): Single<Map<Player, Int>> = Single.fromCallable { scores }
 }

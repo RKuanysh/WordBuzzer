@@ -5,11 +5,9 @@ import androidx.lifecycle.ViewModel
 import com.raimbekov.wordbuzzer.game.domain.GameInteractor
 import com.raimbekov.wordbuzzer.game.model.Player
 import com.raimbekov.wordbuzzer.game.model.Question
-import com.raimbekov.wordbuzzer.word.model.Word
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlin.random.Random
 
 class GameViewModel(
     numberOfPlayers: Int,
@@ -20,10 +18,9 @@ class GameViewModel(
     private var answerSubscription: Disposable? = null
     private var questionSubscription: Disposable? = null
 
-    val testLiveData = MutableLiveData<String>().apply { value = Random.nextDouble().toString() }
     val playersLiveData = MutableLiveData<List<Player>>()
     val questionLiveData = MutableLiveData<Question>()
-    val scoreLiveData = MutableLiveData<Pair<Player, Int>>()
+    val scoreLiveData = MutableLiveData<Map<Player, Int>>()
 
     init {
         gameSubscription = gameInteractor.start(numberOfPlayers)
@@ -49,8 +46,8 @@ class GameViewModel(
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(
-                { score ->
-                    scoreLiveData.value = player to score
+                {
+                    scoreLiveData.value = it
                     requestQuestion()
                 },
                 { }
