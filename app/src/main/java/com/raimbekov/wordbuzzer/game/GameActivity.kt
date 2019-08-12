@@ -83,6 +83,8 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.endOfGameEvent.observe(this, Observer {
+            translationTextView.clearAnimation()
+
             AlertDialog.Builder(this)
                 .setTitle("Game ended")
                 .setMessage("End of game")

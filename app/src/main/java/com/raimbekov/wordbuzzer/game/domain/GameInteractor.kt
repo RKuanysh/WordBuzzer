@@ -7,7 +7,7 @@ import com.raimbekov.wordbuzzer.word.domain.WordInteractor
 import io.reactivex.Completable
 import io.reactivex.Single
 
-private const val NUMBER_OF_QUESTIONS = 3
+private const val NUMBER_OF_QUESTIONS = 10
 
 class GameInteractor(
     private val wordInteractor: WordInteractor,
