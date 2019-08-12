@@ -1,5 +1,6 @@
 package com.raimbekov.wordbuzzer
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.animation.Animation
@@ -84,6 +85,11 @@ class MainActivity : AppCompatActivity() {
             AlertDialog.Builder(this)
                 .setTitle("Game ended")
                 .setMessage("End of game")
+                .setOnDismissListener {
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
                 .show()
         })
     }
