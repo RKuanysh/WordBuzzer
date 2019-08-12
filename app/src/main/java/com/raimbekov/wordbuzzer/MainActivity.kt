@@ -1,12 +1,17 @@
 package com.raimbekov.wordbuzzer
 
 import android.os.Bundle
+import android.util.DisplayMetrics
+import android.view.animation.Animation
+import android.view.animation.TranslateAnimation
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.random.Random
+
 
 private const val NUMBER_OF_PLAYERS = 2
 
@@ -14,9 +19,17 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel: GameViewModel by viewModel { parametersOf(NUMBER_OF_PLAYERS) }
 
+    private var screenWidth: Int = 0
+    private var screenHeight: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        screenWidth = displayMetrics.widthPixels
+        screenHeight = displayMetrics.heightPixels
 
         viewModel.playersLiveData.observe(this, Observer { players ->
             button1.text = "player ${players[0].id}"
@@ -34,6 +47,27 @@ class MainActivity : AppCompatActivity() {
         viewModel.questionLiveData.observe(this, Observer {
             wordTextView.text = it.correctAnswer.word
             translationTextView.text = it.display.translation
+
+            translationTextView.clearAnimation()
+            val animation = getTranslationAnimation()
+            animation.duration = 3000
+            animation.fillAfter = false
+            animation.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationRepeat(animation: Animation?) {
+
+                }
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    translationTextView.alpha = 0f
+                }
+
+                override fun onAnimationStart(animation: Animation?) {
+                    translationTextView.alpha = 1f
+                }
+            })
+
+            translationTextView.startAnimation(animation)
+
         })
 
         viewModel.scoreLiveData.observe(this, Observer { score ->
@@ -53,4 +87,24 @@ class MainActivity : AppCompatActivity() {
                 .show()
         })
     }
+
+    private fun getTranslationAnimation(): TranslateAnimation =
+        when (Random.nextInt(4)) {
+            0 -> TranslateAnimation(
+                -screenWidth / 2f + 50, screenWidth / 2f - 50,
+                -screenHeight / 2f + 50, screenHeight / 2f - 50
+            )
+            1 -> TranslateAnimation(
+                screenWidth / 2f - 50, -screenWidth / 2f + 50,
+                -screenHeight / 2f + 50, screenHeight / 2f - 50
+            )
+            2 -> TranslateAnimation(
+                screenWidth / 2f - 50, -screenWidth / 2f + 50,
+                screenHeight / 2f - 50, -screenHeight / 2f + 50
+            )
+            else -> TranslateAnimation(
+                -screenWidth / 2f + 50, screenWidth / 2f - 50,
+                screenHeight / 2f - 50, -screenHeight / 2f + 50
+            )
+        }
 }
