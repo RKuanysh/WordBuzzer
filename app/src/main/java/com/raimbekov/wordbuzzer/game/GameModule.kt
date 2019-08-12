@@ -1,6 +1,5 @@
 package com.raimbekov.wordbuzzer.game
 
-import com.raimbekov.wordbuzzer.GameViewModel
 import com.raimbekov.wordbuzzer.game.domain.GameInteractor
 import com.raimbekov.wordbuzzer.game.domain.GameRepository
 import com.raimbekov.wordbuzzer.game.gateway.GameMemoryRepository

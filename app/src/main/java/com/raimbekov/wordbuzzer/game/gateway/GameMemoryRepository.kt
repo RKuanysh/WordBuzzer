@@ -7,13 +7,15 @@ import com.raimbekov.wordbuzzer.game.model.Question
 import com.raimbekov.wordbuzzer.game.model.QuestionHolder
 import io.reactivex.Completable
 import io.reactivex.Single
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 class GameMemoryRepository : GameRepository {
 
     private lateinit var game: Game
     private lateinit var questions: List<Question>
-    private var currentQuestion: Int = 0
-    private val scores: HashMap<Player, Int> = HashMap()
+    private var currentQuestion = AtomicInteger(0)
+    private val scores = ConcurrentHashMap<Player, Int>()
 
     override fun setGame(game: Game): Completable =
         Completable.fromAction {
@@ -31,30 +33,28 @@ class GameMemoryRepository : GameRepository {
 
     override fun getQuestion(): Single<QuestionHolder> =
         Single.fromCallable {
-            if (questions.size == currentQuestion) {
+            if (questions.size == currentQuestion.get()) {
                 QuestionHolder.GameEnded
             } else {
-                QuestionHolder.NextQuestion(questions.get(currentQuestion))
+                QuestionHolder.NextQuestion(questions.get(currentQuestion.get()))
             }
         }
 
-    override fun incrementScore(player: Player): Single<Int> =
-        Single.fromCallable {
+    override fun incrementScore(player: Player): Completable =
+        Completable.fromAction {
             val newScore = scores.get(player)!! + 1
             scores.put(player, newScore)
-            newScore
         }
 
-    override fun decrementScore(player: Player): Single<Int> =
-        Single.fromCallable {
+    override fun decrementScore(player: Player): Completable =
+        Completable.fromAction {
             val newScore = scores.get(player)!! - 1
             scores.put(player, newScore)
-            newScore
         }
 
     override fun incrementCurrentQuestion(): Completable =
         Completable.fromAction {
-            currentQuestion += 1
+            currentQuestion.incrementAndGet()
         }
 
     override fun getScore(): Single<Map<Player, Int>> = Single.fromCallable { scores }

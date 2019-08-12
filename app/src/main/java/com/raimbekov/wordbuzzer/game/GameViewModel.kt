@@ -1,4 +1,4 @@
-package com.raimbekov.wordbuzzer
+package com.raimbekov.wordbuzzer.game
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

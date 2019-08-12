@@ -10,8 +10,8 @@ import io.reactivex.Single
 interface GameRepository {
     fun setQuestions(questions: List<Question>): Completable
     fun getQuestion(): Single<QuestionHolder>
-    fun incrementScore(player: Player): Single<Int>
-    fun decrementScore(player: Player): Single<Int>
+    fun incrementScore(player: Player): Completable
+    fun decrementScore(player: Player): Completable
     fun setGame(game: Game): Completable
     fun getGame(): Single<Game>
     fun incrementCurrentQuestion(): Completable

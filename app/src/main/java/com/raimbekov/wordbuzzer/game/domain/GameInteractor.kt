@@ -25,14 +25,14 @@ class GameInteractor(
         gameRepository.getQuestion()
             .map { (it as QuestionHolder.NextQuestion).question }
             .map { it.correctAnswer == it.display }
-            .flatMap { isCorrect ->
+            .flatMapCompletable { isCorrect ->
                 if (isCorrect) {
                     gameRepository.incrementScore(player)
                 } else {
                     gameRepository.decrementScore(player)
                 }
             }
-            .flatMap { gameRepository.getScore() }
+            .andThen(gameRepository.getScore())
 
     fun getCurrentQuestion(): Single<QuestionHolder> = gameRepository.getQuestion()
 
